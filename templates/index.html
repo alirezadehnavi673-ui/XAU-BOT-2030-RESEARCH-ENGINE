@@ -1,0 +1,291 @@
+<!DOCTYPE html><html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XAU BOT 2030 — RESEARCH ENGINE</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0e17;
+      --panel: #111827;
+      --border: #283449;
+      --text: #e8eef8;
+      --muted: #8b9ab1;
+      --gold: #e8bd62;
+      --green: #27c995;
+      --red: #ff6474;
+    }* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+header {
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #0d1320;
+}
+
+.brand {
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+}
+
+h1 { font-size: 21px; margin: 9px 0; }
+h2 { font-size: 15px; margin-top: 0; }
+p { color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+main {
+  width: min(1100px, 100%);
+  margin: auto;
+  padding: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 16px;
+  margin-bottom: 14px;
+  min-width: 0;
+}
+
+.wide { grid-column: 1 / -1; }
+
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 12px 0 7px;
+}
+
+input, select, button {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+input, select {
+  color: var(--text);
+  background: #0a101c;
+  border: 1px solid var(--border);
+}
+
+button {
+  border: 0;
+  margin-top: 14px;
+  color: #17130a;
+  background: var(--gold);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.metric {
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.status { color: var(--gold); }
+.chart {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  background: #0a101c;
+}
+
+.notice {
+  border-right: 3px solid var(--gold);
+  padding: 8px 12px;
+  background: #191a20;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media (max-width: 520px) {
+  .grid { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
+  h1 { font-size: 18px; }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">XAU BOT 2030</div>
+    <h1>RESEARCH ENGINE <span style="color:#e8bd62">V1.0</span></h1>
+    <p>موتور تحقیق، تحلیل عوامل و ارزیابی بازار طلا</p>
+  </header>  <main>
+    <section class="panel">
+      <h2>تنظیمات تحلیل</h2>  <label for="factor">عامل مورد بررسی</label>
+  <select id="factor">
+    <option value="CPI">CPI — شاخص قیمت مصرف‌کننده</option>
+    <option value="US10Y">US10Y — بازده اوراق ۱۰ ساله</option>
+    <option value="REAL_YIELD">REAL YIELD — بازده واقعی</option>
+    <option value="DXY">DXY — شاخص دلار</option>
+    <option value="WTI">WTI — نفت خام</option>
+  </select>
+
+  <label for="asset">دارایی هدف</label>
+  <select id="asset">
+    <option value="XAUUSD">XAUUSD — طلای جهانی</option>
+  </select>
+
+  <label for="oldValue">مقدار قبلی عامل</label>
+  <input id="oldValue" type="number" step="any" placeholder="مقدار قبلی">
+
+  <label for="newValue">مقدار جدید عامل</label>
+  <input id="newValue" type="number" step="any" placeholder="مقدار جدید">
+
+  <label for="goldPrice">قیمت فعلی طلا (اختیاری)</label>
+  <input id="goldPrice" type="number" step="any" placeholder="قیمت XAUUSD">
+
+  <button id="analyze">محاسبه تغییرات اولیه</button>
+</section>
+
+<section class="grid">
+  <div class="panel">
+    <div class="metric">
+      <span>سیگنال تحقیقاتی</span>
+      <strong id="signal" class="status">WAIT</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="metric">
+      <span>تغییر عامل</span>
+      <strong id="change">N/A</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="metric">
+      <span>اطمینان مدل</span>
+      <strong id="confidence">N/A</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="metric">
+      <span>قیمت طلا</span>
+      <strong id="price">N/A</strong>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>نمودار تحقیقاتی</h2>
+  <svg class="chart" viewBox="0 0 600 220"
+       role="img" aria-label="نمودار در انتظار داده واقعی">
+    <g stroke="#283449" stroke-width="1">
+      <path d="M45 30 H580 M45 70 H580 M45 110 H580 M45 150 H580 M45 190 H580"/>
+      <path d="M45 20 V190 H580"/>
+    </g>
+    <text x="300" y="100" fill="#8b9ab1"
+          font-size="15" text-anchor="middle">
+      منتظر داده معتبر بازار
+    </text>
+    <text x="300" y="125" fill="#64748b"
+          font-size="11" text-anchor="middle">
+      نمودار واقعی پس از اتصال منبع داده
+    </text>
+  </svg>
+  <p>این نمودار هنوز داده تاریخی یا قیمت زنده دریافت نمی‌کند.</p>
+</section>
+
+<section class="panel">
+  <h2>وضعیت منابع داده</h2>
+  <p>قیمت زنده XAUUSD: <span class="status">متصل نشده</span></p>
+  <p>داده اقتصادی: <span class="status">متصل نشده</span></p>
+  <p>بک‌تست معتبر: <span class="status">اجرا نشده</span></p>
+  <p class="notice">
+    اعداد آزمایشی به‌عنوان نتیجه واقعی بازار نمایش داده نمی‌شوند.
+  </p>
+</section>
+
+<section class="panel">
+  <h2>گزارش تحلیل</h2>
+  <p id="report">برای شروع، مقادیر قبلی و جدید یک عامل را وارد کنید.</p>
+</section>
+
+  </main>  <footer>
+    XAU BOT 2030 — RESEARCH ENGINE V1.0
+    <br>تحقیق و ارزیابی؛ نه تضمین سود معاملاتی
+  </footer>  <script>
+    const $ = id => document.getElementById(id);
+
+    $('analyze').addEventListener('click', () => {
+      const oldValue = Number($('oldValue').value);
+      const newValue = Number($('newValue').value);
+      const gold = Number($('goldPrice').value);
+
+      if ($('oldValue').value.trim() === '' ||
+          $('newValue').value.trim() === '' ||
+          !Number.isFinite(oldValue) ||
+          !Number.isFinite(newValue)) {
+        $('report').textContent =
+          'لطفاً مقادیر معتبر قبلی و جدید را وارد کنید.';
+        $('signal').textContent = 'WAIT';
+        $('change').textContent = 'N/A';
+        $('confidence').textContent = 'N/A';
+        return;
+      }
+
+      const delta = newValue - oldValue;
+      const pct = oldValue !== 0
+        ? (delta / Math.abs(oldValue)) * 100
+        : null;
+
+      $('change').textContent =
+        pct === null ? 'N/A' : pct.toFixed(2) + '%';
+
+      $('price').textContent =
+        $('goldPrice').value.trim() !== '' &&
+        Number.isFinite(gold) && gold > 0
+          ? gold.toFixed(2)
+          : 'N/A';
+
+      $('signal').textContent = 'WAIT';
+      $('confidence').textContent = 'N/A';
+
+      $('report').textContent =
+        'عامل: ' + $('factor').value +
+        ' | تغییر مطلق: ' + delta.toFixed(4) +
+        ' | تغییر نسبی: ' +
+        (pct === null ? 'قابل محاسبه نیست' : pct.toFixed(2) + '%') +
+        '. جهت اثر این عامل بر طلا بدون مدل معتبر و داده تاریخی تعیین نشده است.';
+
+    });
+  </script></body>
+</html>
